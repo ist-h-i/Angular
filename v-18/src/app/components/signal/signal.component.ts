@@ -1,16 +1,17 @@
-import { Component, NgZone, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Component, NgZone, signal } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 
 /**
  * SignalComponent
  *
  * @description
- *  - formGroupを定義
- *  - formGroupに含まれるFormControlのvalueChangesをsubscribeし、signalプロパティに値を設定
- *  - formGroupをtemplateに渡す
- *  - templateでは、formGroupを使用してフォームを生成
- *  - signalプロパティをtemplateに表示
+ *  - signalという名前のSignalを生成
+ *  - inputイベントが発生した場合、Signalの値を変更
+ *  - Signalの値を表示
+ *
+ * @remarks
+ *  - NgZoneをinject
+ *  - signalは、UIの更新を伴う
  */
 @Component({
   selector: 'app-signal',
@@ -19,71 +20,37 @@ import { Subscription } from 'rxjs';
   templateUrl: './signal.component.html',
   styleUrl: './signal.component.scss'
 })
-export class SignalComponent implements OnDestroy {
+export class SignalComponent {
+  // signal
+  signal = signal('');
 
-  myForm = new FormGroup({
-    name: new FormControl('')
-  });
-
-  /**
-   * signal
-   *
-   * @description
-   *  - formGroupに含まれるFormControlのvalueChangesをsubscribeし、値を設定
-   */
-  signal = '';
+  // NgZone（zonelessの場合は不要）
+  // private zone: NgZone;
 
   /**
-   * Subscription
+   * inputイベント
    *
    * @description
-   *  - formGroupに含まれるFormControlのvalueChangesをsubscribe
+   *  - inputイベントが発生した場合、Signalの値を変更
+   *  - NgZone.runを使用して、Signalの値を変更
+   * @param event inputイベント
    */
-  subscription: Subscription;
+  changeInput(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
 
-  // Zonelessを用いた実装>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  constructor() {
-    /**
-     * formGroupに含まれるFormControlのvalueChangesをsubscribe
-     */
-    this.subscription = this.myForm.get('name')!.valueChanges.subscribe(value => {
-      /**
-       * signalプロパティに値を設定
-       */
-      this.signal = `${value}`;
-    });
+    // NgZone.runを使用して、Signalの値を変更（zonelessの場合は不要）
+    // this.zone.run(() => {
+      this.signal.set(inputElement.value);
+    // })
   }
-  // -----------------------------------------------------------------------------
-  //   /**
-  //    * constructor
-  //    *
-  //    * @description
-  //    *  - formGroupに含まれるFormControlのvalueChangesをsubscribe
-  //    *  - NgZoneを使用して、Zone内でsignalプロパティに値を設定
-  //    * @param ngZone NgZone
-  //    */
-  //   constructor(private ngZone: NgZone) {
-  //   /**
-  //    * formGroupに含まれるFormControlのvalueChangesをsubscribe
-  //    */
-  //   this.subscription = this.myForm.get('name')!.valueChanges.subscribe(value => {
-  //     /**
-  //      * NgZoneを使用して、Zone内でsignalプロパティに値を設定
-  //      */
-  //     this.ngZone.run(() => {
-  //       this.signal = `${value}`;
-  //     });
-  //   });
+
+  // /**
+  //  * Constructor
+  //  *
+  //  * @description
+  //  *  - NgZoneをinject（zonelessの場合は不要）
+  //  */
+  // constructor(zone: NgZone) {
+  //   this.zone = zone;
   // }
-  // Zone.jsを用いた実装<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< <
-
-  /**
-   * ngOnDestroy
-   *
-   * @description
-   *  - Subscriptionをunsubscribe
-   */
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
 }

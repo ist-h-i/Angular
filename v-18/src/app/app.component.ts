@@ -10,10 +10,6 @@ import { SignalComponent } from "./components/signal/signal.component";
     RouterOutlet,
     FormsComponent,
     SignalComponent
-],
-  //zonelessを有効化
-  providers: [
-    { provide: 'zoneless', useValue: true, multi: true }
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

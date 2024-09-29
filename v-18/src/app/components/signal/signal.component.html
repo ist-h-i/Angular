@@ -1,4 +1,3 @@
-<form [formGroup]="myForm">
-    <input formControlName="name">
-</form>
-<p>Signal: {{ signal }}</p>
+<input (input)="changeInput($event)">
+<p>Signal: {{ signal() }}</p>
+
