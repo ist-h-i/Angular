@@ -1,0 +1,36 @@
+<form [formGroup]="myForm">
+    <!-- formArrayName="items"で、FormArray("items")を指定 -->
+    <div formArrayName="items">
+        <!-- items.controlsをループして、各FormControlを表示 -->
+        @for (item of items.controls; track $index) {
+        <div>
+            <!-- FormControlのvalueに紐づくinputを表示 -->
+            <input [formControlName]="$index" type="text">
+        </div>
+        <!-- FormControlのエラーメッセージを表示 -->
+        @if (item.invalid && (item.dirty || item.touched)) {
+        <div>
+            <!-- requiredエラーの場合 -->
+            @if (item.errors?.['required']) {
+            <div>入力してください</div>
+            }
+            <!-- minlengthエラーの場合 -->
+            @if (item.errors?.['minlength']) {
+            <div>最低文字数は{{ item.errors?.['minlength'].requiredLength }}文字です</div>
+            }
+        </div>
+        }
+        }
+    </div>
+    <!-- FormArrayのエラーメッセージを表示 -->
+    @if (items.invalid && (items.dirty || items.touched)) {
+    <div>
+        <!-- atLeastOneItemエラーの場合 -->
+        @if (items.errors?.['atLeastOneItem']) {<div>1つ以上の項目を入力してください</div>}
+    </div>
+    }
+    <!-- 追加ボタン -->
+    <button (click)="addItem()">追加</button>
+    <!-- 削除ボタン -->
+    <button (click)="removeItem()">削除</button>
+</form>
